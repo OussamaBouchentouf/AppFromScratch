@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { TextInput } from "react-native";
 
 import { commonColors } from "./src/utils/Colors";
+import { Tasks } from "./src/components/tasksContainer";
 
 export default function App() {
   return (
@@ -18,13 +20,37 @@ export default function App() {
       style={styles.container}
     >
       <View style={styles.titleContainer}>
-        <Text style={{ fontSize: 30, fontWeight: "bold" }}>Today's tasks</Text>
+        <Text style={styles.titleStyle}>Today's tasks</Text>
       </View>
-      <View style={styles.bodyContainer}></View>
+
+      <View style={styles.bodyContainer}>
+        <ScrollView>
+          <Tasks
+            text={"task number 1task number 1task number 1task number 1"}
+          />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+          <Tasks text={"task number 2"} />
+        </ScrollView>
+      </View>
+
       <View style={styles.inputContainer}>
-        <TextInput style={styles.textInput} />
+        <TextInput
+          style={styles.textInput}
+          placeholder="Write a task"
+          keyboardAppearance="dark"
+        />
         <TouchableOpacity style={styles.button}>
-          <Text>+</Text>
+          <Text style={styles.textUnderButton}>+</Text>
         </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
@@ -34,14 +60,19 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: commonColors.Gray,
+    backgroundColor: "#e6eced",
     justifyContent: "flex-start",
   },
   titleContainer: {
     flex: 0.2,
-    alignItems: "flex-start",
+    alignItems: "center",
     justifyContent: "flex-end",
-    backgroundColor: commonColors.Green,
+    backgroundColor: "#bbeefa",
+  },
+  titleStyle: {
+    fontSize: 30,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   bodyContainer: {
     flex: 1,
@@ -51,23 +82,30 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: commonColors.Maroon,
+    backgroundColor: "#e6eced",
   },
   textInput: {
     flex: 0.9,
-    borderColor: commonColors.Black,
+    borderColor: "#c3c8c9",
     borderRadius: 50,
     height: 50,
     borderWidth: 3,
     backgroundColor: "white",
+    textAlign: "center",
   },
   button: {
-    backgroundColor: commonColors.Yellow,
-    borderColor: commonColors.Black,
-    borderRadius: 50,
+    backgroundColor: commonColors.White,
+    borderColor: "#c3c8c9",
+    borderRadius: 25,
+    borderWidth: 3,
     width: 50,
     height: 50,
     justifyContent: "center",
     alignItems: "center",
+  },
+  textUnderButton: {
+    fontSize: 20,
+    color: "#c3c8c9",
+    textAlign: "center",
   },
 });
