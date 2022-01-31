@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,13 +7,30 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  TextInput,
+  Keyboard,
 } from "react-native";
-import { TextInput } from "react-native";
+import {} from "react-native";
 
 import { commonColors } from "./src/utils/Colors";
 import { Tasks } from "./src/components/tasksContainer";
 
 export default function App() {
+  const [task, setTask] = useState(null);
+  const [taskItems, setTaskItems] = useState([]);
+
+  const handledTask = () => {
+    Keyboard.dismiss();
+    setTaskItems([...taskItems, task]);
+    setTask(null);
+  };
+
+  const completTask = (index) => {
+    let itemsCopy = [...taskItems];
+    itemsCopy.splice(index, 1);
+    setTaskItems(itemsCopy);
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -25,21 +42,13 @@ export default function App() {
 
       <View style={styles.bodyContainer}>
         <ScrollView>
-          <Tasks
-            text={"task number 1task number 1task number 1task number 1"}
-          />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
-          <Tasks text={"task number 2"} />
+          {taskItems.map((item, index) => {
+            return (
+               <TouchableOpacity key={index} onPress={() => completTask(index)}>
+                <Tasks text={item} />
+               </TouchableOpacity>
+            );
+          })}
         </ScrollView>
       </View>
 
@@ -48,8 +57,9 @@ export default function App() {
           style={styles.textInput}
           placeholder="Write a task"
           keyboardAppearance="dark"
+          onChangeText={(text) => setTask(text)}
         />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => handledTask()}>
           <Text style={styles.textUnderButton}>+</Text>
         </TouchableOpacity>
       </View>
@@ -74,8 +84,14 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 10,
   },
+  simpleText: {
+    fontSize: 20,
+    color: commonColors.Black,
+    fontWeight: "800",
+  },
   bodyContainer: {
     flex: 1,
+    padding: 10,
   },
   inputContainer: {
     flex: 0.2,

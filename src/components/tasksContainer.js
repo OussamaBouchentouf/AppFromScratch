@@ -1,6 +1,5 @@
 import React from "react";
 import { Text, View, StyleSheet } from "react-native";
-import { TextInput } from "react-native-paper";
 
 import { commonColors } from "../utils/Colors";
 
