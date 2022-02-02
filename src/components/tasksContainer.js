@@ -1,14 +1,49 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Text, View, StyleSheet } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
+import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { commonColors } from "../utils/Colors";
 
 export const Tasks = (props) => {
+  const [isSelected, setIsSelected] = useState();
+
   return (
     <View style={styles.globalView}>
-      <View style={styles.shape} />
+      {isSelected ? (
+        <Ionicons
+          name="checkmark-done"
+          size={24}
+          color="#32cd32"
+          onPress={() => {
+            setIsSelected(false);
+          }}
+        />
+      ) : (
+        <MaterialIcons
+          name="remove-done"
+          size={24}
+          color={commonColors.Red}
+          onPress={() => {
+            setIsSelected(true);
+          }}
+        />
+      )}
       <Text style={styles.taskName}>{props.text}</Text>
-      <View style={styles.circular} />
+      <Entypo.Button
+        name="trash"
+        size={20}
+        color="#dc143C"
+        backgroundColor={"white"}
+        iconStyle={{ marginRight: 0 }}
+        onPress={() => {
+          props.onPressOnCicular(isSelected);
+        }}
+      >
+        Delete
+      </Entypo.Button>
     </View>
   );
 };
@@ -23,25 +58,13 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginTop: 15,
   },
-  shape: {
-    borderRadius: 5,
-    backgroundColor: '#4fdeff',
-    height: 24,
-    width: 24,
-    opacity: 0.3,
-  },
   taskName: {
+    flex: 0.9,
     fontStyle: "italic",
+    textAlign: "center",
     fontWeight: "bold",
     fontSize: 15,
-    maxWidth: "80%",
+    maxWidth: "90%",
     flexWrap: "wrap",
-  },
-  circular: {
-    height: 18,
-    width: 18,
-    borderRadius: 9,
-    borderWidth: 2,
-    borderColor: '#4fdeff',
   },
 });

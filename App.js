@@ -11,12 +11,14 @@ import {
   Keyboard,
   Dimensions,
   Alert,
+  RefreshControl,
 } from "react-native";
-import {} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useFonts, Comforter_400Regular } from "@expo-google-fonts/comforter";
 
 import { commonColors } from "./src/utils/Colors";
 import { Tasks } from "./src/components/tasksContainer";
+import AppLoading from "expo-app-loading";
 
 const windowWidth = Dimensions.get("window").width;
 const windowHeight = Dimensions.get("window").height;
@@ -24,6 +26,21 @@ const windowHeight = Dimensions.get("window").height;
 export default function App() {
   const [task, setTask] = useState();
   const [taskItems, setTaskItems] = useState([]);
+
+  const wait = (timeout) => {
+    return new Promise((resolve) => setTimeout(resolve, timeout));
+  };
+
+  const [refreshing, setRefreshing] = React.useState(false);
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    wait(2000).then(() => setRefreshing(false));
+  }, []);
+
+  let [fontloader] = useFonts({
+    Comforter_400Regular,
+  });
 
   useEffect(() => {
     loadState();
@@ -43,7 +60,7 @@ export default function App() {
 
   const completTask = (index) => {
     let itemsCopy = [...taskItems];
-    itemsCopy.splice(index, 1);
+    itemsCopy[index] = null;
     setTaskItems(itemsCopy);
   };
 
@@ -68,66 +85,85 @@ export default function App() {
 
   const createButtonAlert = () =>
     Alert.alert("Error", "Please enter a task", [
-      {
-        text: "Cancel",
-        onPress: () => null,
-        style: "cancel",
-      },
       { text: "OK", onPress: () => null },
     ]);
 
-  return (
-    <>
-      <View style={styles.titleContainer}>
-        <Text style={styles.titleStyle}>Today's tasks</Text>
-      </View>
+  const createButtonAlertForCompleteTasks = (index, isSelected) =>
+    isSelected
+      ? completTask(index)
+      : Alert.alert("Warning", "Do you want to remove this task ? ", [
+          { text: "OK", onPress: () => completTask(index) },
+          { text: "Cancel", onPress: () => null },
+        ]);
 
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.container}
-      >
-        <View style={styles.bodyContainer}>
-          {!taskItems.length ? (
-            <View
-              style={{
-                flex: 1,
-                alignItems: "center",
-                justifyContent: "center",
-              }}
+  if (!fontloader) {
+    return <AppLoading />;
+  } else {
+    return (
+      <>
+        <View style={styles.titleContainer}>
+          <Text style={styles.titleStyle}>Today's tasks</Text>
+        </View>
+
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          style={styles.container}
+        >
+          <View style={styles.bodyContainer}>
+            {!taskItems.length ? (
+              <View
+                style={{
+                  flex: 1,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={styles.simpleText}>Nothing yet :D </Text>
+              </View>
+            ) : (
+              <ScrollView
+                refreshControl={
+                  <RefreshControl
+                    refreshing={refreshing}
+                    onRefresh={onRefresh}
+                  />
+                }
+              >
+                {taskItems.map((item, index) => {
+                  if (item == null) return;
+                  return (
+                    <Tasks
+                      text={item}
+                      key={index}
+                      onPressOnCicular={(isSelected) =>
+                        createButtonAlertForCompleteTasks(index, isSelected)
+                      }
+                    />
+                  );
+                })}
+              </ScrollView>
+            )}
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.textInput}
+              placeholder="Write a task"
+              keyboardAppearance="dark"
+              value={task}
+              onChangeText={(text) => setTask(text)}
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handledTask()}
             >
-              <Text style={styles.simpleText}>Nothing yet :D </Text>
-            </View>
-          ) : (
-            <ScrollView>
-              {taskItems.map((item, index) => {
-                return (
-                  <TouchableOpacity
-                    key={index}
-                    onPress={() => completTask(index)}
-                  >
-                    <Tasks text={item} />
-                  </TouchableOpacity>
-                );
-              })}
-            </ScrollView>
-          )}
-        </View>
-
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="Write a task"
-            keyboardAppearance="dark"
-            value={task}
-            onChangeText={(text) => setTask(text)}
-          />
-          <TouchableOpacity style={styles.button} onPress={() => handledTask()}>
-            <Text style={styles.textUnderButton}>+</Text>
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </>
-  );
+              <Text style={styles.textUnderButton}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
@@ -144,7 +180,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: 30,
-    fontWeight: "bold",
+    fontFamily: "Comforter_400Regular",
     marginBottom: 10,
   },
   simpleText: {
